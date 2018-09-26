@@ -1,0 +1,181 @@
+---
+title: "hw02-seraphinearnold"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 02: Explore Gapminder and use dplyr
+
+## Bring rectangular data in
+
+```{r}
+#install.packages("tidyverse")
+#install.packages("gapminder")
+```
+
+```{r}
+library(gapminder)
+library(tidyverse)
+```
+
+## Smell test the data
+
+### Is it a data.frame, a matrix, a vector, a list?
+### What is its class?
+### How many variables/columns?
+### How many rows/observations?
+ 
+```{r}
+str(gapminder)
+```
+ 
+*  I's a data.frame
+* Classes are 'tbl_df', 'tbl' and 'data.frame'
+  This could also be identified with "class(gapminder)"
+* There are 1704 rows/observations of  6 variables/columns
+
+ 
+### Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
+
+Another option would be to use glimpse:
+```{r}
+glimpse(gapminder)
+```
+
+Or specifically ncol and nrow:
+
+```{r}
+ncol(gapminder)
+nrow(gapminder)
+```
+
+
+### What data type is each variable?
+
+* country  : Factor 
+* continent: Factor
+* year     : int  
+* lifeExp  : num  
+* pop      : int  
+* gdpPercap: num  
+
+## Explore individual variables
+
+```{r}
+summary(gapminder)
+```
+* Categorial variable I picked: Country
+* Quantitative variable I picked: lifeExp
+
+
+### What are possible values (or range, whichever is appropriate) of each variable?
+```{r}
+summary(gapminder$country)
+```
+For a categorial variable like country it makes no sense to look the mean or range, etc. Looking at the levels would make sense though
+
+```{r}
+levels(gapminder$country)
+```
+
+
+```{r}
+summary(gapminder$lifeExp)
+```
+For lifeExp it's quite helpful and interesting to explore these values. You could use a quick descriptive statistic with the summary command or specifically explore others like
+
+```{r}
+min(gapminder$lifeExp, na.rm = T)
+max(gapminder$lifeExp, na.rm = T)
+range(gapminder$lifeExp)
+```
+Or
+```{r}
+mean(gapminder$lifeExp, na.rm = T)
+```
+```{r}
+median(gapminder$lifeExp, na.rm = T)
+```
+
+### What values are typical? What’s the spread? What’s the distribution? Etc., tailored to the variable at hand.
+```{r}
+sd(gapminder$lifeExp, na.rm = T)
+```
+```{r}
+var(gapminder$lifeExp, na.rm = T)
+```
+
+
+## Explore various plot types
+
+### Relation between lifeExp and country
+```{r}
+ggplot(gapminder, aes(country, lifeExp))+
+  geom_point()+
+  xlab("country") +
+  ylab("LifeExp") +
+  ggtitle("Scatter plot life Expectation and Country")
+```
+
+
+Histogram of LifeExpectancy
+```{r}
+ggplot(gapminder, aes(lifeExp)) +
+    geom_histogram(bins = 50)
+```
+
+
+Life Expectancy Kernel Density Plot
+```{r}
+  ggplot(gapminder, aes(lifeExp)) +
+    geom_histogram(aes(y=..density..)) +
+    geom_density()
+```
+
+
+## Use filter(), select() and %>%
+
+Using the select function
+```{r}
+select(gapminder, lifeExp) %>% 
+  summary()
+```
+
+
+LifeExp density only for Europe (using the filter function)
+
+```{r}
+gapminder %>% 
+  filter(continent == "Europe") %>% 
+  ggplot(aes(lifeExp)) +
+  geom_density()
+
+```
+
+
+Boxplot LifeExp only for Europa:
+
+```{r}
+gapminder %>% 
+  select(continent, lifeExp) %>% 
+  filter(continent == 'Europe') %>% 
+  ggplot(aes(continent, lifeExp)) + 
+  scale_y_log10() +
+  geom_boxplot(aes(fill = continent), alpha = 0.2) + 
+  geom_jitter(alpha = 0.2)
+```
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
